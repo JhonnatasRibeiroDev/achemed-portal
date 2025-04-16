@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { signInWithPopup } from "firebase/auth";
+import { auth, googleProvider } from "@/lib/firebase";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -25,10 +27,26 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const handleGoogleLogin = async () => {
+    setIsLoading(true);
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+      console.log(user);
+      router.push("/");
+    } catch (error) {
+      console.error("Erro ao autenticar com Google:", error);
+      alert("Falha ao autenticar com Google.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
+    // Aqui será a lógica futura de autenticação com email/senha via Firebase
     setTimeout(() => {
       setIsLoading(false);
       router.push("/");
@@ -38,7 +56,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex flex-col lg:flex-row font-sans bg-white text-gray-900">
       {/* Lado esquerdo - Login */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center bg-gradient-to-br from-sky-700 to-sky-800 p-6">
+      <div className="w-full lg:w-1/2 flex items-center justify-center bg-gradient-to-br from-sky-500 to-sky-800 p-6">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <img
@@ -133,7 +151,19 @@ export default function LoginPage() {
                   type="submit"
                   className="w-full bg-sky-600 hover:bg-sky-700"
                   disabled={isLoading}>
-                  {isLoading ? "Entrando..." : "Entrar"}
+                  {isLoading ? (
+                    <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                  ) : (
+                    "Entrar"
+                  )}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={handleGoogleLogin}
+                  disabled={isLoading}>
+                  {isLoading ? "Autenticando..." : "Entrar com Google"}
                 </Button>
                 <p className="text-center text-sm text-muted-foreground">
                   Não tem uma conta?{" "}
@@ -158,7 +188,7 @@ export default function LoginPage() {
         <img
           src="https://funcionalcontabil.com.br/wp-content/uploads/2024/11/Receita-Saude-O-que-e-e-Como-Emitir-o-Recibo-Medico-funcional-contabil.png"
           alt="Saúde"
-          className="w-full h-full object-cover object-center z-0"
+          className="w-full h-full object-cover z-0"
         />
       </div>
     </div>

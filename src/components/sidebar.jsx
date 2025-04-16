@@ -19,14 +19,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
+import useAuth from "@/hooks/useAuth"; // Importa o hook de autenticação
 
 export function Sidebar({ isOpen, setIsOpen }) {
+  const { user, logout } = useAuth(); // Pega o usuário autenticado
   const [isMinimized, setIsMinimized] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Estado para controlar se o usuário está logado
+
   const toggleSidebar = () => setIsOpen(!isOpen);
   const toggleMinimized = () => setIsMinimized(!isMinimized);
 
-  // Detectar tamanho da tela para decidir se deve mostrar o sidebar minimizado por padrão em telas menores
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 1024 && window.innerWidth >= 768) {
@@ -36,19 +37,13 @@ export function Sidebar({ isOpen, setIsOpen }) {
       }
     };
 
-    // Configuração inicial
     handleResize();
-
-    // Adicionar listener para redimensionamento
     window.addEventListener("resize", handleResize);
-
-    // Limpar listener
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   return (
     <>
-      {/* Mobile overlay */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 md:hidden"
@@ -56,7 +51,6 @@ export function Sidebar({ isOpen, setIsOpen }) {
         />
       )}
 
-      {/* Mobile toggle button */}
       <Button
         variant="outline"
         size="icon"
@@ -65,7 +59,6 @@ export function Sidebar({ isOpen, setIsOpen }) {
         {isOpen ? <X size={20} /> : <Menu size={20} />}
       </Button>
 
-      {/* Sidebar */}
       <aside
         className={cn(
           "fixed top-0 left-0 z-40 h-screen bg-[#00468B] text-white transition-all duration-300 md:translate-x-0",
@@ -93,7 +86,7 @@ export function Sidebar({ isOpen, setIsOpen }) {
             )}
           </div>
 
-          {/* Navigation */}
+          {/* Navegação */}
           <nav className="flex-1 p-2">
             <ul className="space-y-1">
               <SidebarItem
@@ -136,14 +129,15 @@ export function Sidebar({ isOpen, setIsOpen }) {
             </ul>
           </nav>
 
-          {/* Footer */}
+          {/* Rodapé */}
           <div className="p-2 border-t border-sky-500">
             {!isMinimized && (
               <>
-                {isLoggedIn ? (
+                {user ? (
                   <Button
                     variant="ghost"
-                    className="w-full justify-start text-white hover:bg-sky-700 mb-2">
+                    className="w-full justify-start text-white hover:bg-sky-700 mb-2"
+                    onClick={logout}>
                     <LogOut className="mr-2 h-4 w-4" />
                     Sair
                   </Button>
@@ -172,49 +166,51 @@ export function Sidebar({ isOpen, setIsOpen }) {
               </>
             )}
 
-            {/* Botões de login/registro para sidebar minimizado */}
-            {isMinimized && !isLoggedIn && (
+            {isMinimized && (
               <>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="w-full flex justify-center text-white hover:bg-sky-700 mb-2"
-                  asChild
-                  title="Entrar">
-                  <Link href="/login">
-                    <LogIn size={20} />
-                  </Link>
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="w-full flex justify-center text-white hover:bg-sky-700 mb-2"
-                  asChild
-                  title="Registrar">
-                  <Link href="/registro">
-                    <UserPlus size={20} />
-                  </Link>
-                </Button>
+                {!user ? (
+                  <>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="w-full flex justify-center text-white hover:bg-sky-700 mb-2"
+                      asChild
+                      title="Entrar">
+                      <Link href="/login">
+                        <LogIn size={20} />
+                      </Link>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="w-full flex justify-center text-white hover:bg-sky-700 mb-2"
+                      asChild
+                      title="Registrar">
+                      <Link href="/registro">
+                        <UserPlus size={20} />
+                      </Link>
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="w-full flex justify-center text-white hover:bg-sky-700 mb-2"
+                    title="Sair"
+                    onClick={logout}>
+                    <LogOut size={20} />
+                  </Button>
+                )}
               </>
             )}
 
-            {/* Botão de logout para sidebar minimizado */}
-            {isMinimized && isLoggedIn && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-full flex justify-center text-white hover:bg-sky-700 mb-2"
-                title="Sair">
-                <LogOut size={20} />
-              </Button>
-            )}
-
-            {/* Botão para minimizar/expandir - visível apenas em telas médias e grandes */}
+            {/* Botão minimizar */}
             <Button
               variant="ghost"
               size="icon"
               onClick={toggleMinimized}
-              className="hidden md:flex w-full justify-center text-white hover:bg-sky-700">
+              className="hidden md:flex w-full justify-center text-white hover:bg-sky-700"
+              title={isMinimized ? "Expandir" : "Minimizar"}>
               {isMinimized ? (
                 <ChevronRight size={20} />
               ) : (
