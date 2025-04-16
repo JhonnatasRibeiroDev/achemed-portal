@@ -165,7 +165,7 @@ export default function Home() {
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
-      <main className="flex-1 p-4 md:p-6 md:ml-16 lg:ml-64 transition-all duration-300">
+      <main className="flex-1 p-4 md:p-6  transition-all duration-300">
         <div className="container mx-auto">
           <header className="sticky top-0 bg-white shadow z-30 p-4 flex justify-between items-center mb-6 rounded-lg">
             <h1 className="text-2xl font-bold text-sky-700">Portal Achemed</h1>
@@ -197,12 +197,12 @@ export default function Home() {
             </div>
           </header>
 
-          <section className="mb-8 bg-white p-6 rounded-xl shadow-sm">
+          <section className="mb-8 bg-sky-50 p-6 rounded-xl shadow-sm">
             <h2 className="text-xl font-semibold text-sky-700 mb-4">
               Buscar Médicos
             </h2>
             <div className="flex flex-col md:flex-row gap-4 mb-4">
-              <div className="flex-1 relative">
+              <div className="flex-1 relative bg-white rounded-xl">
                 <Search
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
                   size={18}
@@ -214,7 +214,7 @@ export default function Home() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              <div className="w-full md:w-64">
+              <div className="w-full md:w-64 ">
                 <Select
                   value={selectedSpecialty}
                   onValueChange={setSelectedSpecialty}>
@@ -230,7 +230,7 @@ export default function Home() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="flex-1 relative">
+              <div className="flex-1 relative bg-white rounded-xl">
                 <Search
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
                   size={18}
