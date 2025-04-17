@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   Menu,
   X,
@@ -21,14 +22,92 @@ import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import useAuth from "@/hooks/useAuth"; // Importa o hook de autenticação
 
-export function Sidebar({ isOpen, setIsOpen }) {
+export function Sidebar({ isOpen, setIsOpen, userPlatform }) {
   const { user, logout } = useAuth(); // Pega o usuário autenticado
-  const [isMinimized, setIsMinimized] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(true);
 
   const toggleSidebar = () => setIsOpen(!isOpen);
   const toggleMinimized = () => setIsMinimized(!isMinimized);
 
+  //mostrar o tipo de user
   useEffect(() => {
+    console.log("Tye", userPlatform);
+    console.log("IsOpen", isOpen);
+    console.log("IsMinimized", isMinimized);
+  }, [userPlatform, isOpen, isMinimized]);
+
+  //Gerenciar itens do Menu
+  const pathname = usePathname();
+  const [MenuItens, setMenuItens] = useState({});
+  useEffect(() => {
+    if (userPlatform === "pacient") {
+      setMenuItens({
+        home: {
+          icon: <Home size={20} />,
+          label: "Início",
+          href: "/",
+        },
+        calendar: {
+          icon: <Calendar size={20} />,
+          label: "Consultas",
+          href: "/consultas",
+        },
+        doctors: {
+          icon: <User size={20} />,
+          label: "Médicos",
+          href: "/medicos",
+        },
+        favorites: {
+          icon: <Heart size={20} />,
+          label: "Favoritos",
+          href: "/favoritos",
+        },
+        settings: {
+          icon: <Settings size={20} />,
+          label: "Configurações",
+          href: "/configuracoes",
+        },
+        help: {
+          icon: <HelpCircle size={20} />,
+          label: "Ajuda",
+          href: "/ajuda",
+        },
+      });
+    }
+
+    if (userPlatform === "doctor") {
+      setMenuItens({
+        home: {
+          icon: <Home size={20} />,
+          label: "Início",
+          href: "/",
+        },
+        calendar: {
+          icon: <Calendar size={20} />,
+          label: "Consultas",
+          href: "/consultas",
+        },
+        patients: {
+          icon: <User size={20} />,
+          label: "Pacientes",
+          href: "/pacientes",
+        },
+        settings: {
+          icon: <Settings size={20} />,
+          label: "Configurações",
+          href: "/configuracoes",
+        },
+        help: {
+          icon: <HelpCircle size={20} />,
+          label: "Ajuda",
+          href: "/ajuda",
+        },
+      });
+    }
+  }, [userPlatform]);
+
+  //para que a tela comece com menu aberto
+  /*  useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 1024 && window.innerWidth >= 768) {
         setIsMinimized(true);
@@ -40,7 +119,7 @@ export function Sidebar({ isOpen, setIsOpen }) {
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, []); */
 
   return (
     <>
@@ -89,43 +168,19 @@ export function Sidebar({ isOpen, setIsOpen }) {
           {/* Navegação */}
           <nav className="flex-1 p-2">
             <ul className="space-y-1">
-              <SidebarItem
-                icon={<Home size={20} />}
-                label="Início"
-                href="/"
-                active
-                isMinimized={isMinimized}
-              />
-              <SidebarItem
-                icon={<Calendar size={20} />}
-                label="Consultas"
-                href="/consultas"
-                isMinimized={isMinimized}
-              />
-              <SidebarItem
-                icon={<User size={20} />}
-                label="Médicos"
-                href="/medicos"
-                isMinimized={isMinimized}
-              />
-              <SidebarItem
-                icon={<Heart size={20} />}
-                label="Favoritos"
-                href="/favoritos"
-                isMinimized={isMinimized}
-              />
-              <SidebarItem
-                icon={<Settings size={20} />}
-                label="Configurações"
-                href="/configuracoes"
-                isMinimized={isMinimized}
-              />
-              <SidebarItem
-                icon={<HelpCircle size={20} />}
-                label="Ajuda"
-                href="/ajuda"
-                isMinimized={isMinimized}
-              />
+              {Object.entries(MenuItens).map(([key, item]) => {
+                const isActive = pathname.startsWith(item.href);
+                return (
+                  <SidebarItem
+                    key={key}
+                    icon={item.icon}
+                    label={item.label}
+                    href={item.href}
+                    active={isActive}
+                    isMinimized={isMinimized}
+                  />
+                );
+              })}
             </ul>
           </nav>
 
