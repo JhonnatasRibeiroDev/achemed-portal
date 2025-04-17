@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Sidebar } from "@/components/sidebar";
 import HomePacient from "@/components/home-pacient";
+import ChatBot from "@/components/chat/chat-bot";
 import HomeDoctor from "@/components/home-doctor";
 import useAuth from "@/hooks/useAuth";
 
@@ -25,6 +26,7 @@ export default function Home() {
   }
   return (
     <div className="flex min-h-screen bg-gray-50">
+      <ChatBot />
       <Sidebar
         isOpen={isSidebarOpen}
         setIsOpen={setIsSidebarOpen}
